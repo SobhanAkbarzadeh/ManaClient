@@ -87,7 +87,7 @@
                 <MudButton OnClick="@(() => visible_11 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.AttachFile" aria-label="مدارک ضمیمه">مدارک ضمیمه</MudButton>
             </MudPaper>
         </MudCard>
-        <MudTable Items="@TableDatas" Dense="true" Hover="true" Bordered="true" Striped="true">
+        <MudTable Items="@TableDatas" Dense="true" Hover="true" Bordered="true" Striped="true" Class="mt-4">
             <ToolBarContent>
                 <MudText Typo="Typo.h6">لیست درخواست های ثبت شده</MudText>
                 <MudSpacer/>
@@ -391,6 +391,9 @@
     string[] errors = { };
     MudForm form;
 
+    public string searchString1 { get; set; }
+
+
     private DialogOptions dialogOptions = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true,CloseButton = true };
 
     bool visible_1, visible_2, visible_3, visible_4, visible_5, visible_6, visible_7, visible_8, visible_9, visible_10, visible_11;
@@ -401,7 +404,6 @@
 
     OrderModel model = new OrderModel();
 
-    static searchString1 = string.empty;
 
     public class OrderModel
     {
