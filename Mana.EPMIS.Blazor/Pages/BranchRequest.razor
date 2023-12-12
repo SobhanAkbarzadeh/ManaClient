@@ -1,0 +1,594 @@
+﻿@page "/branchRequest"
+@using FluentValidation
+
+<MudTabs Elevation="2" Rounded="true" ApplyEffectsToContainer="true" PanelClass="pa-6">
+    <MudTabPanel Text="مشخصات متقاضی">
+        <MudCard>
+            <MudForm Model="@model" @ref="@form" Validation="@(orderValidator.ValidateValue)" ValidationDelay="0">
+                <MudCardContent>
+                    <MudTextField @bind-Value="model.Name"
+                                  For="@(() => model.Name)"
+                                  Immediate="true"
+                                  Label="Name" />
+
+                    <MudTextField @bind-Value="model.Email"
+                                  For="@(() => model.Email)"
+                                  Immediate="true"
+                                  Label="Email" />
+
+                    <MudTextField @bind-Value="model.CCNumber"
+                                  For="@(() => model.CCNumber)"
+                                  Immediate="true"
+                                  Label="Credit card nr" />
+
+                    <MudTextField @bind-Value="model.Address.Address"
+                                  For="@(() => model.Address.Address)"
+                                  Immediate="true"
+                                  Label="Address" />
+
+                    <MudTextField @bind-Value="model.Address.City"
+                                  For="@(() => model.Address.City)"
+                                  Immediate="true"
+                                  Label="City" />
+
+                    <MudTextField @bind-Value="model.Address.Country"
+                                  For="@(() => model.Address.Country)"
+                                  Immediate="true"
+                                  Label="Country" />
+
+                    <MudCheckBox @bind-Checked="IsDisable" Label="IsDisable"></MudCheckBox>
+                </MudCardContent>
+                <MudCardContent Class="pa-0">
+
+                    <MudTable Items="@model.OrderDetails" Hover="true" Breakpoint="Breakpoint.None" Dense="@true" Elevation="0">
+                        <HeaderContent>
+                            <MudTh>Description</MudTh>
+                            <MudTh>Offer</MudTh>
+                        </HeaderContent>
+                        <RowTemplate>
+                            <MudTd DataLabel="Description">
+                                <MudForm Model="@context" Validation=@(orderDetailsValidator.ValidateValue)>
+                                    <MudTextField Label="Enter Description"
+                                                  @bind-Value="context.Description"
+                                                  For="(() => context.Description)" />
+                                </MudForm>
+                            </MudTd>
+                            <MudTd DataLabel="Offer">
+                                <MudForm Model="@context">
+                                    <MudNumericField Label="Enter Offer"
+                                                     @bind-Value="context.Offer"
+                                                     Validation=@(orderDetailsValidator.ValidateValue)
+                                                     For="(() => context.Offer)" />
+                                </MudForm>
+                            </MudTd>
+                        </RowTemplate>
+                    </MudTable>
+
+                </MudCardContent>
+            </MudForm>
+            <MudCardActions>
+                <MudButton Variant="Variant.Filled" Color="Color.Primary" Class="ml-auto" OnClick="@(async () => await Submit())">Order</MudButton>
+            </MudCardActions>
+        </MudCard>
+    </MudTabPanel>
+    <MudTabPanel Text="مشخصات انشعاب" Disabled="IsDisable">
+        <MudCard>
+            <MudPaper Class="d-flex justify-space-between flex-grow-1 gap-4 pa-4 " Elevation="0">
+                <MudButton OnClick="@(() => visible_1 = true)" Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.AddHomeWork" aria-label="نصب جدید">نصب جدید</MudButton>
+                <MudButton OnClick="@(() => visible_2 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ChangeCircle" aria-label="تغییر قدرت">تغییر قدرت</MudButton>
+                <MudButton OnClick="@(() => visible_3 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.SwitchAccessShortcut" aria-label="موقت به دائم">موقت به دائم</MudButton>
+                <MudButton OnClick="@(() => visible_4 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.PublishedWithChanges" aria-label="غیر مجاز به مجاز">غیر مجاز به مجاز</MudButton>
+                <MudButton OnClick="@(() => visible_5 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.VerticalSplit" aria-label="تفکیک - ادغام">تفکیک - ادغام</MudButton>
+                <MudButton OnClick="@(() => visible_6 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.PowerOff" aria-label="جمع آوری دائم">جمع آوری دائم</MudButton>
+                <MudButton OnClick="@(() => visible_7 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.ElectricalServices" aria-label="برق کوتاه مدت">برق کوتاه مدت</MudButton>
+                <MudButton OnClick="@(() => visible_8 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.AccountTree" aria-label="انشعاب موجود در محل">انشعاب موجود در محل</MudButton>
+                <MudButton OnClick="@(() => visible_9 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.EditLocationAlt" aria-label="جغرافیای تقاضا">جغرافیای تقاضا</MudButton>
+                <MudButton OnClick="@(() => visible_10 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.MapsHomeWork" aria-label="ساختمان انشعاب">ساختمان انشعاب</MudButton>
+                <MudButton OnClick="@(() => visible_11 = true)"Variant="Variant.Text" Color="Color.Primary" EndIcon="@Icons.Material.Filled.AttachFile" aria-label="مدارک ضمیمه">مدارک ضمیمه</MudButton>
+            </MudPaper>
+        </MudCard>
+        <MudTable Items="@TableDatas" Dense="true" Hover="true" Bordered="true" Striped="true">
+            <ToolBarContent>
+                <MudText Typo="Typo.h6">لیست درخواست های ثبت شده</MudText>
+                <MudSpacer/>
+                <MudTextField @bind-Value="searchString1" Placeholder="Search" Adornment="Adornment.Start" AdornmentIcon="@Icons.Material.Filled.Search" IconSize="Size.Medium" Class="mt-0"></MudTextField>
+            </ToolBarContent>
+            <HeaderContent>
+                <MudTh>ردیف</MudTh>
+                <MudTh>نوع درخواست</MudTh>
+                <MudTh>رمز</MudTh>
+                <MudTh>فاز جدید</MudTh>
+                <MudTh>آمپر جدید</MudTh>
+                <MudTh>قدرت قراردادی جدید</MudTh>
+                <MudTh>تعرفه جدید</MudTh>
+                <MudTh>نوع انشعاب جدید</MudTh>
+                <MudTh>فاز قبلی</MudTh>
+                <MudTh>آمپر قبلی</MudTh>
+                <MudTh>قدرت قراردادی قبلی</MudTh>
+                <MudTh>تعرفه قبلی</MudTh>
+                <MudTh>نوع انشعاب قبلی</MudTh>
+                <MudTh>تلفن همراه مالک</MudTh>
+                <MudTh>تسهیلات</MudTh>
+                <MudTh>نام مالک</MudTh>
+                <MudTh>آدرس انشعاب</MudTh>
+            </HeaderContent>
+            <RowTemplate>
+                <MudTd DataLabel="ردیف">                @context.prop1        </MudTd>
+                <MudTd DataLabel="نوع درخواست">         @context.prop2         </MudTd>
+                <MudTd DataLabel="رمز">                 @context.prop3        </MudTd>
+                <MudTd DataLabel="فاز جدید">            @context.prop4         </MudTd>
+                <MudTd DataLabel="آمپر جدید">           @context.prop5          </MudTd>
+                <MudTd DataLabel="قدرت قراردادی جدید">  @context.prop6        </MudTd>
+                <MudTd DataLabel="تعرفه جدید">          @context.prop7        </MudTd>
+                <MudTd DataLabel="نوع انشعاب جدید">     @context.prop8        </MudTd>
+                <MudTd DataLabel="فاز قبلی">            @context.prop9        </MudTd>
+                <MudTd DataLabel="آمپر قبلی">           @context.prop10     </MudTd>
+                <MudTd DataLabel="قدرت قراردادی قبلی">  @context.prop11     </MudTd>
+                <MudTd DataLabel="تعرفه قبلی">          @context.prop12     </MudTd>
+                <MudTd DataLabel="نوع انشعاب قبلی">     @context.prop13        </MudTd>
+                <MudTd DataLabel="تلفن همراه مالک">     @context.prop14        </MudTd>
+                <MudTd DataLabel="تسهیلات">              @context.prop15           </MudTd>
+                <MudTd DataLabel="نام مالک">            @context.prop16            </MudTd>
+                <MudTd DataLabel="آدرس انشعاب">         @context.prop17            </MudTd> 
+                    @* <MudTd DataLabel="ردیف">            1</MudTd>
+                    <MudTd DataLabel="نوع درخواست">برق جدید     </MudTd>
+                    <MudTd DataLabel="رمز">10057706</MudTd>
+                    <MudTd DataLabel="فاز جدید">1</MudTd>
+                    <MudTd DataLabel="آمپر جدید">25</MudTd>
+                    <MudTd DataLabel="قدرت قراردادی جدید">5</MudTd>
+                    <MudTd DataLabel="تعرفه جدید">خانگی</MudTd>
+                    <MudTd DataLabel="نوع انشعاب جدید">دائم</MudTd>
+                    <MudTd DataLabel="فاز قبلی">0</MudTd>
+                    <MudTd DataLabel="آمپر قبلی">0</MudTd>
+                    <MudTd DataLabel="قدرت قراردادی قبلی">0</MudTd>
+                    <MudTd DataLabel="تعرفه قبلی">0</MudTd>
+                    <MudTd DataLabel="نوع انشعاب قبلی"></MudTd>
+                    <MudTd DataLabel="تلفن همراه مالک">09186598844</MudTd>
+                    <MudTd DataLabel="تسهیلات">بهزیستی</MudTd>
+                    <MudTd DataLabel="نام مالک">علی محمدی</MudTd>
+                    <MudTd DataLabel="آدرس انشعاب">خرم آباد - خیابان ...</MudTd> *@
+                </RowTemplate>
+                <PagerContent>
+                    <MudTablePager />
+                </PagerContent>
+            </MudTable>
+    </MudTabPanel>
+</MudTabs>
+
+
+
+<MudDialog @bind-IsVisible="visible_1" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+            <MudButton Variant="Variant.Filled" Color="Color.Primary">تکفاز 25 آمپر خانگی</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Secondary">سه فاز 25 آمپر عمومی</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Info">دیماندی 30 کیلوات صنعتی</MudButton>
+            <MudButton Variant="Variant.Filled" Color="Color.Warning">ثبت مجوز ها</MudButton>
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+            <MudGrid>
+                <MudItem xs="3">
+                    <MudTextField T="int" Label="رمز همسایه چپ"></MudTextField>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField T="int" Label="اشتراک همسایه چپ"></MudTextField>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField T="int" Label="رمز همسایه راست"></MudTextField>
+                </MudItem>
+                <MudItem xs="3">
+                    <MudTextField T="int" Label="اشتراک همسایه راست"></MudTextField>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudSelect T="int" Label="فاز">
+                        <MudSelectItem Value="1">تک فاز</MudSelectItem>
+                        <MudSelectItem Value="3">سه فاز</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudSelect T="int" Label="آمپر">
+                        <MudSelectItem Value="5">5</MudSelectItem>
+                        <MudSelectItem Value="10">10</MudSelectItem>
+                        <MudSelectItem Value="15">15</MudSelectItem>
+                        <MudSelectItem Value="20">20</MudSelectItem>
+                        <MudSelectItem Value="25">25</MudSelectItem>
+                        <MudSelectItem Value="32">32</MudSelectItem>
+                        <MudSelectItem Value="50">50</MudSelectItem>
+                    </MudSelect>
+                </MudItem>
+                <MudItem xs="4">
+                    <MudTextField T="int" Label="قدرت قراردادی"></MudTextField>
+                </MudItem>
+            </MudGrid>
+        </MudForm> 
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto" >Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_2" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_3" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_4" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_5" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_6" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_7" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_8" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_9" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_10" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+           
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+<MudDialog @bind-IsVisible="visible_11" Options="dialogOptions">
+    <TitleContent>
+        <MudText Typo="Typo.h6">فرم انشعاب جدید</MudText>
+        <MudPaper Class="d-flex justify-center flex-grow-1 gap-4 mt-2" Elevation="0">
+
+        </MudPaper>
+    </TitleContent>
+    <DialogContent>
+        @*         <MudForm @ref="form" @bind-IsValid="@success" @bind-Errors="@errors">
+        </MudForm> *@
+        <MudText>Dialog one</MudText>
+    </DialogContent>
+    <DialogActions>
+        <MudButton Variant="Variant.Filled" Color="Color.Primary" Disabled="@(!success)" Class="ml-auto">Save</MudButton>
+    </DialogActions>
+</MudDialog>
+
+
+
+
+@code {
+    [Inject] ISnackbar Snackbar { get; set; }
+
+    public bool IsDisable = true;
+    bool success;
+    string[] errors = { };
+    MudForm form;
+
+    private DialogOptions dialogOptions = new() { MaxWidth = MaxWidth.ExtraExtraLarge, FullWidth = true,CloseButton = true };
+
+    bool visible_1, visible_2, visible_3, visible_4, visible_5, visible_6, visible_7, visible_8, visible_9, visible_10, visible_11;
+
+    OrderModelFluentValidator orderValidator = new OrderModelFluentValidator();
+
+    OrderDetailsModelFluentValidator orderDetailsValidator = new OrderDetailsModelFluentValidator();
+
+    OrderModel model = new OrderModel();
+
+    static searchString1 = string.empty;
+
+    public class OrderModel
+    {
+        public string Name { get; set; }
+        public string Email { get; set; }
+        public string CCNumber { get; set; } = "4012 8888 8888 1881";
+        public AddressModel Address { get; set; } = new AddressModel();
+        public List<OrderDetailsModel> OrderDetails = new List<OrderDetailsModel>()
+        {
+            new OrderDetailsModel()
+                {
+                    Description = "Perform Work order 1",
+                    Offer = 100
+                },
+            new OrderDetailsModel()
+        };
+    }
+
+    public class AddressModel
+    {
+        public string Address { get; set; }
+        public string City { get; set; }
+        public string Country { get; set; }
+    }
+
+    public class OrderDetailsModel
+    {
+        public string Description { get; set; }
+        public decimal Offer { get; set; }
+    }
+
+    private async Task Submit()
+    {
+        await form.Validate();
+
+        if (form.IsValid)
+        {
+            Snackbar.Add("Submited!");
+        }
+    }
+
+    /// <summary>
+    /// A standard AbstractValidator which contains multiple rules and can be shared with the back end API
+    /// </summary>
+    /// <typeparam name="OrderModel"></typeparam>
+    public class OrderModelFluentValidator : AbstractValidator<OrderModel>
+    {
+        public OrderModelFluentValidator()
+        {
+            RuleFor(x => x.Name)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleFor(x => x.Email)
+                .Cascade(CascadeMode.Stop)
+                .NotEmpty()
+                .EmailAddress()
+                .MustAsync(async (value, cancellationToken) => await IsUniqueAsync(value));
+
+            RuleFor(x => x.CCNumber)
+                .NotEmpty()
+                .Length(1, 100)
+                .CreditCard();
+
+            RuleFor(x => x.Address.Address)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleFor(x => x.Address.City)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleFor(x => x.Address.Country)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleForEach(x => x.OrderDetails)
+                .SetValidator(new OrderDetailsModelFluentValidator());
+        }
+
+        private async Task<bool> IsUniqueAsync(string email)
+        {
+            // Simulates a long running http call
+            await Task.Delay(2000);
+            return email.ToLower() != "test@test.com";
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<OrderModel>.CreateWithOptions((OrderModel)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+
+    /// <summary>
+    /// A standard AbstractValidator for the Collection Object
+    /// </summary>
+    /// <typeparam name="OrderDetailsModel"></typeparam>
+    public class OrderDetailsModelFluentValidator : AbstractValidator<OrderDetailsModel>
+    {
+        public OrderDetailsModelFluentValidator()
+        {
+            RuleFor(x => x.Description)
+                .NotEmpty()
+                .Length(1, 100);
+
+            RuleFor(x => x.Offer)
+                .GreaterThan(0)
+                .LessThan(999);
+        }
+
+        public Func<object, string, Task<IEnumerable<string>>> ValidateValue => async (model, propertyName) =>
+        {
+            var result = await ValidateAsync(ValidationContext<OrderDetailsModel>.CreateWithOptions((OrderDetailsModel)model, x => x.IncludeProperties(propertyName)));
+            if (result.IsValid)
+                return Array.Empty<string>();
+            return result.Errors.Select(e => e.ErrorMessage);
+        };
+    }
+
+    public List<TableData> TableDatas = new()
+    {
+        new TableData
+        {
+             prop1  =   "1"
+            ,prop2  =   "برق جدید"
+            ,prop3  =   "10057706"
+            ,prop4  =   "1"
+            ,prop5  =   "25"
+            ,prop6  =   "5"
+            ,prop7  =   "خانگی"
+            ,prop8  =   "دائم"
+            ,prop9  =   "0"
+            ,prop10 =   "0"
+            ,prop11 =   "0"
+            ,prop12 =   "0"
+            ,prop13 =   "0"
+            ,prop14 =   "09180364455"
+            ,prop15 =   "بهزیستی"
+            ,prop16 =   "علی محمدی"
+            ,prop17 =   "خرم آباد"
+        },
+        new TableData
+        {
+             prop1  =   "2"
+            ,prop2  =   "افزایش"
+            ,prop3  =   "10057707"
+            ,prop4  =   "3"
+            ,prop5  =   "25"
+            ,prop6  =   "15"
+            ,prop7  =   "صنعتی"
+            ,prop8  =   "دائم"
+            ,prop9  =   "1"
+            ,prop10 =   "25"
+            ,prop11 =   "0"
+            ,prop12 =   "0"
+            ,prop13 =   "0"
+            ,prop14 =   "09163658855"
+            ,prop15 =   "کمیته امداد"
+            ,prop16 =   "محمد بیگلری"
+            ,prop17 =   "همدان"
+        },
+
+    };
+    
+
+    public class TableData
+    {
+        public string prop1  { get; set; }
+        public string prop2  { get; set; }
+        public string prop3  { get; set; }
+        public string prop4  { get; set; }
+        public string prop5  { get; set; }
+        public string prop6  { get; set; }
+        public string prop7  { get; set; }
+        public string prop8  { get; set; }
+        public string prop9  { get; set; }
+        public string prop10 { get; set; }
+        public string prop11 { get; set; }
+        public string prop12 { get; set; }
+        public string prop13 { get; set; }
+        public string prop14 { get; set; }
+        public string prop15 { get; set; }
+        public string prop16 { get; set; }
+        public string prop17 { get; set; }
+    }
+
+}
